@@ -24,7 +24,7 @@ WORKDIR /var/lib/nginx
 
 RUN rm -rf html
 # Assuming the 'cloned_repo' directory is your build context
-COPY ./cloned_repo/epaath_es_oneactivity_project /var/lib/nginx/html
+COPY . html
 
 # The next line clones the project directly, which is now handled in the GitHub Actions workflow
 # RUN git clone --depth=1 --single-branch --branch with_all_activities https://GITLAB_USERNAME:GITLAB_PASSWORD@git2023.olenepal.org/regan/epaath_es_oneactivity_project.git html 
