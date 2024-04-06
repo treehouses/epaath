@@ -97,7 +97,7 @@ jobs:
         run: |
           # Replace @ with %40 in the password for URL encoding
           ENCODED_PASSWORD=$(echo $GITLAB_PASSWORD | sed 's/@/%40/g')
-          git clone --depth=1 --single-branch --branch master https://${GITLAB_USERNAME}:${ENCODED_PASSWORD}@git2023.olenepal.org/regan/epaath_es_oneactivity_project.git cloned_repo
+          git clone --depth=1 --single-branch --branch master https://${GITLAB_USERNAME}:${ENCODED_PASSWORD}@git2023.olenepal.org/regan/epaath_es_oneactivity_project.git
 
       - name: Login to Docker
         run: |
@@ -116,7 +116,7 @@ jobs:
           repo="rayheyehygun/epaath"
           dest="$repo:${{ matrix.arch }}"
           date="$(date +%Y%m%d%H%M)"
-          docker build -t $dest --build-arg BASE=$base ./cloned_repo
+          docker build -t $dest --build-arg BASE=$base ./
           docker tag $dest docker.io/$dest
           docker tag $dest $dest-$date
           docker push --all-tags docker.io/$repo
