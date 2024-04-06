@@ -97,7 +97,7 @@ jobs:
         run: |
           # Replace @ with %40 in the password for URL encoding
           ENCODED_PASSWORD=$(echo $GITLAB_PASSWORD | sed 's/@/%40/g')
-          git clone --depth=1 --single-branch --branch master https://${GITLAB_USERNAME}:${ENCODED_PASSWORD}@git2023.olenepal.org/regan/epaath_es_oneactivity_project.git
+          git clone --depth=1 --single-branch --branch with_all_activities https://${GITLAB_USERNAME}:${ENCODED_PASSWORD}@git2023.olenepal.org/regan/epaath_es_oneactivity_project.git
 
       - name: Login to Docker
         run: |
