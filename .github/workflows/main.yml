@@ -1,3 +1,72 @@
+# name: build on change
+
+# on:
+#   push:
+#     branches:
+#       - master
+#       - main
+#   workflow_dispatch:
+#   repository_dispatch:
+#     types: epaath
+
+# jobs:
+#   build-and-push:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         arch: [amd64, arm, arm64]
+    
+#     steps:
+#       - name: Login to Docker
+#         run: |
+#           echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+#           # echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+          
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v1
+        
+#       - name: Build and push Docker image
+#         env:
+#           GITLAB_USERNAME: ${{ secrets.GITLAB_USERNAME }}
+#           GITLAB_PASSWORD: ${{ secrets.GITLAB_PASSWORD }}
+#         run: |
+#           export DOCKER_CLI_EXPERIMENTAL=enabled
+#           base="treehouses/nginx-tags:${{ matrix.arch }}"
+#           repo="rayheyehygun/epaath"
+#           dest="$repo:${{ matrix.arch }}"
+#           date="$(date +%Y%m%d%H%M)"
+#           echo a
+#           docker build -t $dest --build-arg BASE=$base ./
+#           echo 0
+#           # docker tag $dest ghcr.io/$dest
+#           docker tag $dest docker.io/$dest
+#           echo 1 $dest
+#           docker tag $dest $dest-$date
+#           echo 2 $repo
+#           docker images
+#           # docker push --all-tags ghcr.io/$repo
+#           docker push --all-tags docker.io/$repo
+
+#   # notify:
+#   #     needs: build-and-push
+#   #     runs-on: ubuntu-latest
+#   #     if: always()
+#   #     steps:
+#   #       - name: Notify about new Docker images
+#   #         env:
+#   #           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+#   #         run: |
+#   #           curl -H "Content-Type: application/json" \
+#   #                -X POST \
+#   #                -d '{"Epaath": "New Docker images have been built and pushed successfully."}' \
+#   #                $DISCORD_WEBHOOK_URL
+
+
+
 name: build on change
 
 on:
@@ -10,7 +79,7 @@ on:
     types: epaath
 
 jobs:
-  build-and-push:
+  clone-and-build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -18,49 +87,31 @@ jobs:
         arch: [amd64, arm, arm64]
     
     steps:
-      - name: Login to Docker
-        run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          # echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      
       - name: Checkout code
         uses: actions/checkout@v4
-          
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
         
-      - name: Build and push Docker image
+      - name: Clone EPaath project
         env:
           GITLAB_USERNAME: ${{ secrets.GITLAB_USERNAME }}
           GITLAB_PASSWORD: ${{ secrets.GITLAB_PASSWORD }}
         run: |
-          export DOCKER_CLI_EXPERIMENTAL=enabled
+          git clone --depth=1 --single-branch --branch with_all_activities https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@git2023.olenepal.org/regan/epaath_es_oneactivity_project.git cloned_repo
+          
+      - name: Login to Docker
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push Docker image
+        run: |
           base="treehouses/nginx-tags:${{ matrix.arch }}"
           repo="rayheyehygun/epaath"
           dest="$repo:${{ matrix.arch }}"
           date="$(date +%Y%m%d%H%M)"
-          echo a
-          docker build -t $dest --build-arg BASE=$base ./
-          echo 0
-          # docker tag $dest ghcr.io/$dest
+          docker build -t $dest --build-arg BASE=$base ./cloned_repo
           docker tag $dest docker.io/$dest
-          echo 1 $dest
           docker tag $dest $dest-$date
-          echo 2 $repo
-          docker images
-          # docker push --all-tags ghcr.io/$repo
           docker push --all-tags docker.io/$repo
 
-  # notify:
-  #     needs: build-and-push
-  #     runs-on: ubuntu-latest
-  #     if: always()
-  #     steps:
-  #       - name: Notify about new Docker images
-  #         env:
-  #           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-  #         run: |
-  #           curl -H "Content-Type: application/json" \
-  #                -X POST \
-  #                -d '{"Epaath": "New Docker images have been built and pushed successfully."}' \
-  #                $DISCORD_WEBHOOK_URL
