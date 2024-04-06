@@ -112,7 +112,7 @@ jobs:
           repo="rayheyehygun/epaath"
           dest="$repo:${{ matrix.arch }}"
           date="$(date +%Y%m%d%H%M)"
-          docker build -t $dest --build-arg BASE=$base ./
+          docker build -t $dest --build-arg BASE=$base ./epaath_es_oneactivity_project
           docker tag $dest docker.io/$dest
           docker tag $dest $dest-$date
           docker push --all-tags docker.io/$repo
