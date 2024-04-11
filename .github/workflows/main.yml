@@ -41,7 +41,8 @@ jobs:
           dest="$repo:${{ matrix.arch }}"
           date="$(date +%Y%m%d%H%M)"
           echo a
-          docker build -t $dest --build-arg BASE=$base ./
+          docker buildx build --platform linux/${{ matrix.arch }} -t $dest --build-arg BASE=$base ./
+          # docker build -t $dest --build-arg BASE=$base ./
           echo 0
           # docker tag $dest ghcr.io/$dest
           docker tag $dest docker.io/$dest
