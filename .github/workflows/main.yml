@@ -15,8 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [amd64, arm64]
-        # arch: [amd64, arm, arm64]
+        arch: [arm64]
     
     steps:
       - name: Login to Docker
@@ -40,11 +39,8 @@ jobs:
           repo="rayheyehygun/epaath"
           dest="$repo:${{ matrix.arch }}"
           date="$(date +%Y%m%d%H%M)"
-          arch="${{ matrix.arch }}"
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-          docker build --platform linux/$arch -t $dest --build-arg BASE=$base ./
-          # docker build -t $dest --build-arg BASE=$base ./
-          echo 0
+          docker build -t $dest --build-arg BASE=$base ./
           # docker tag $dest ghcr.io/$dest
           docker tag $dest docker.io/$dest
           echo 1 $dest
