@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [arm64]
+        arch: [arm64, amd64]
     
     steps:
       - name: Login to Docker
